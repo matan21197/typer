@@ -1,0 +1,7 @@
+.failedText {
+  background-color: red;
+}
+
+.passedText {
+  background-color: green;
+}
