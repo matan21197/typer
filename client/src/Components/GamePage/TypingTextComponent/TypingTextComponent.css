@@ -1,0 +1,13 @@
+.failedText {
+  white-space: pre-line;
+  background-color: red;
+}
+
+.passedText {
+  white-space: pre-line;
+  background-color: green;
+}
+
+.remainingText {
+  white-space: pre-line;
+}

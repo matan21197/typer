@@ -13,5 +13,11 @@
   "license": "ISC",
   "devDependencies": {
     "concurrently": "^3.5.1"
+  },
+  "dependencies": {
+    "react": "^16.13.1",
+    "react-infinite-scroller": "^1.2.4",
+    "react-router-dom": "^5.1.2",
+    "sweetalert": "^2.1.2"
   }
 }

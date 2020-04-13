@@ -7,7 +7,6 @@ class TypingText extends Component {
   completedWordsCount = 0;
 
   state = {
-    typingText: this.props.text,
     passedText: "",
     failedText: "",
     remainingText: "",
@@ -27,7 +26,7 @@ class TypingText extends Component {
     console.log("init game");
     this.setState(
       {
-        remainingText: this.state.typingText
+        remainingText: this.props.text
       },
       () => {
         this.curWord = this.getNextWord();
@@ -71,8 +70,8 @@ class TypingText extends Component {
   }
 
   getNextWord() {
-    let nextSpaceIndex = this.state.remainingText.indexOf(" ");
-    if (nextSpaceIndex != -1) {
+    let nextSpaceIndex = Math.min(this.state.remainingText.indexOf(" "), this.state.remainingText.indexOf('\n'));
+    if (nextSpaceIndex !== -1) {
       return this.state.remainingText.substr(0, nextSpaceIndex);
     }
     if (this.state.remainingText) {
@@ -85,12 +84,13 @@ class TypingText extends Component {
     this.initGame();
   }
 
+  
   handleType(event) {
     let newText = event.target.value;
 
     // Handle backspace
     if (newText.length < this.curText.length) {
-      if (this.state.failedText != "") {
+      if (this.state.failedText !== "") {
         this.setState({
           remainingText:
             this.state.failedText[this.state.failedText.length - 1] +
@@ -120,8 +120,8 @@ class TypingText extends Component {
       });
     } else {
       if (
-        event.target.value[event.target.value.length - 1] == " " &&
-        this.curWord == this.curText.slice(0, -1)
+        event.target.value[event.target.value.length - 1] === " "  &&
+        this.curWord === this.curText.slice(0, -1)
       ) {
         // Handle completing a word
         event.target.value = "";
@@ -161,7 +161,7 @@ class TypingText extends Component {
 
           <span className="passedText">{this.state.passedText}</span>
           <span className="failedText">{this.state.failedText}</span>
-          <span>{this.state.remainingText}</span>
+          <span className="remainingText">{this.state.remainingText}</span>
         </div>
         <input type="text" onChange={this.handleType} />
 

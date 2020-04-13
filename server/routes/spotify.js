@@ -3,12 +3,13 @@ var request = require("request"); // "Request" library
 var cors = require("cors");
 var querystring = require("querystring");
 var cookieParser = require("cookie-parser");
+var keys = require('../config/keys')
 
 var router = express.Router();
 
-var client_id = "8cb89083a79f4164af0a2f0eea9a230d"; // Your client id
-var client_secret = "85df7ed9653a49479a122709be815b1d"; // Your secret
-var redirect_uri = "https://localhost:3001/api/spotify/callback"; // Your redirect uri
+var client_id = keys.spotify.client_id
+var client_secret = keys.spotify.client_secret
+var redirect_uri = "http://localhost:3001/api/spotify/callback"; // Your redirect uri
 var stateKey = "spotify_auth_state";
 
 /**
@@ -85,22 +86,11 @@ router.get("/callback", function(req, res) {
     request.post(authOptions, function(error, response, body) {
       if (!error && response.statusCode === 200) {
         var access_token = body.access_token,
-          refresh_token = body.refresh_token;
-
-        var options = {
-          url: "https://api.spotify.com/v1/me",
-          headers: { Authorization: "Bearer " + access_token },
-          json: true
-        };
-
-        // use the access token to access the Spotify Web API
-        request.get(options, function(error, response, body) {
-          console.log(body);
-        });
+            refresh_token = body.refresh_token;
 
         // we can also pass the token to the browser to make requests from there
         res.redirect(
-          "http://localhost:3000" +
+          "http://localhost:3000/spotify#" +
             querystring.stringify({
               access_token: access_token,
               refresh_token: refresh_token

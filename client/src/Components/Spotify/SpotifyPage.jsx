@@ -1,45 +1,43 @@
 import React, { Component } from "react";
+import SpotifyLoginComponent from './SpotifyLoginComponent/SpotifyLoginComponent'
+import PlaylistList from "./SpotifyPlaylistList/PlaylistList";
 
 class SpotifyPage extends Component {
-  state = {};
+  state = {    
+    accessToken: null,
+    refreshToken: null,
+  };
 
-  openSpotifyLogin() {
-    fetch("/api/spotify/login")
-      .then(res => res.json())
-      .then(asd => console.log(asd));
+  componentDidMount() {
+    var params = this.getHashes();
+    if (params.error ) {
+    } else if (params.access_token){
+      this.setState({
+        accessToken: params.access_token,
+        refreshToken: params.refresh_token
+      });
+    }
   }
 
-  getSpotifyRequestCredentials() {
-    // fetch("/api/spotify/login").then();
+  getHashes() {
+    var hashParams = {};
+    var e,
+      r = /([^&;=]+)=?([^&;]*)/g,
+      q = window.location.hash.substring(1);
+    while ((e = r.exec(q))) {
+      hashParams[e[1]] = decodeURIComponent(e[2]);
+    }
+    return hashParams;
   }
 
   render() {
+    const isLoggedIn = this.state.accessToken != null
+    const componentToShow = isLoggedIn ?
+      <PlaylistList accessToken={this.state.accessToken}></PlaylistList> :
+      <SpotifyLoginComponent></SpotifyLoginComponent>
     return (
       <div>
-        {
-          <div className="container">
-            <div id="login">
-              <h1>This is an example of the Authorization Code flow</h1>
-              <a
-                href="http://localhost:3001/api/spotify/login"
-                className="btn btn-primary"
-              >
-                Log in with Spotify
-              </a>
-            </div>
-            <div id="loggedin">
-              <div id="user-profile" />
-              <div id="oauth" />
-              <button
-                className="btn btn-default"
-                id="obtain-new-token"
-                onClick={this.openSpotifyLogin}
-              >
-                Obtain new token using the refresh token
-              </button>
-            </div>
-          </div>
-        }
+        {componentToShow}
       </div>
     );
   }
