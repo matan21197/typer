@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import Button from "@material-ui/core/Button";
 
 class SpotifyLoginComponent extends Component {
   state = {};
@@ -9,24 +10,14 @@ class SpotifyLoginComponent extends Component {
         {
           <div className="container">
             <div id="login">
-              <h1>This is an example of the Authorization Code flow</h1>
               <a
+                style={{textDecoration: "none"}}
                 href="http://localhost:3001/api/spotify/login"
-                className="btn btn-primary"
               >
-                Log in with Spotify
+                <Button variant="contained" color="secondary">
+                  Log in with Spotify
+                </Button>
               </a>
-            </div>
-            <div id="loggedin">
-              <div id="user-profile" />
-              <div id="oauth" />
-              <button
-                className="btn btn-default"
-                id="obtain-new-token"
-                onClick={this.openSpotifyLogin}
-              >
-                Obtain new token using the refresh token
-              </button>
             </div>
           </div>
         }

@@ -5,21 +5,19 @@ import SongList from "./SongList";
 import {SPOTIFY_GET_PLAYLIST_URL} from "../../../Urls";
 import { PLAYLIST_PAGE_SIZE } from "../../../consts";
 import InfiniteScroll from "react-infinite-scroller";
+import noImage from "./no_image.png"
 
 class PlaylistView extends Component {
   state = {};
   render() {
     const playlist = this.props.playlist;
     const image =
-      playlist.images.length > 0 ? (
         <img
           className="playlist-image"
-          src={playlist.images[1].url}
+          src={playlist.images.length > 0 ? playlist.images[1].url : noImage}
           alt="spotify playlist"
         />
-      ) : (
-        <div></div>
-      );
+
     return (
       <div className="playlist" onClick={this.props.onClick}>
         {image}

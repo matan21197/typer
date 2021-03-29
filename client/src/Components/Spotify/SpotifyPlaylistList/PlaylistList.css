@@ -1,5 +1,16 @@
 .playlist {
+    display: inline-block;
+    margin: 50px;
+}
 
+.playlist-title {
+    text-overflow: ellipsis;
+    max-width: 200px
+}
+
+.playlist-image {
+    height: 200px;
+    width: 200px;
 }
 
 .playlists {

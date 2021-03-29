@@ -33,26 +33,7 @@ class TypingText extends Component {
       }
     );
 
-    this.setState(
-      {
-        remainingTime: gameLength
-      },
-      () => {
-        this.timerInterval = setInterval(() => {
-          this.setState(
-            {
-              remainingTime: this.state.remainingTime - 1
-            },
-            () => {
-              // update speed every three seconds
-              this.setState({
-                wordSpeed: this.getWordSpeed(gameLength)
-              });
-            }
-          );
-        }, 1000);
-      }
-    );
+    
   }
 
   updateWpm() {}
@@ -153,12 +134,6 @@ class TypingText extends Component {
     return (
       <div>
         <div>
-          <h3>
-            {Math.floor(this.state.remainingTime / 60).toString() +
-              ":" +
-              (this.state.remainingTime % 60)}
-          </h3>
-
           <span className="passedText">{this.state.passedText}</span>
           <span className="failedText">{this.state.failedText}</span>
           <span className="remainingText">{this.state.remainingText}</span>
