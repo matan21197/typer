@@ -1,36 +1,23 @@
 import React, { Component } from 'react';
 class Timer extends Component {
-    state = { remainingTime: 0 }
+    state = { elapsedTime: 0 }
 
-    gameStart() {
+    componentDidMount() {    
+      this.timerInterval = setInterval(() => {
         this.setState(
-            {
-              remainingTime: this.props.time
-            },
-            () => {
-              this.timerInterval = setInterval(() => {
-                this.setState(
-                  {
-                    remainingTime: this.state.remainingTime - 1
-                  },
-                  () => {
-                    // update speed every three seconds
-                    this.setState({
-                      wordSpeed: this.getWordSpeed(this.props.time)
-                    });
-                  }
-                );
-              }, 1000);
-            }
-          );
+          {
+            elapsedTime: this.state.elapsedTime+1
+          }
+        );
+      }, 1000);
     }
 
     render() { 
         return (<div>
             <h3>
-            {Math.floor(this.state.remainingTime / 60).toString() +
+            {Math.floor(this.state.elapsedTime / 60).toString() +
               ":" +
-              (this.state.remainingTime % 60)}
+              (this.state.elapsedTime % 60)}
           </h3>
         </div> );
     }

@@ -1,19 +1,32 @@
 import React, { Component } from "react";
+import Timer from "../Timer";
+// import {TextViewComponent} from './TextViewComponent'
 import "./TypingTextComponent.css";
+
+const TextViewComponent = (props) => {
+  return (<div>
+        <span className="passedText">{props.text.slice(0,props.completelyFinishedIndex)}</span>
+        <span className="passedText">{props.text.slice(props.completelyFinishedIndex, props.completelyFinishedIndex + props.currentlyValidIndex)}</span>
+        <span className="failedText">{props.text.slice(props.completelyFinishedIndex + props.currentlyValidIndex, props.completelyFinishedIndex + props.currentTextIndex)}</span>
+        <span className="remainingText">{props.text.slice(props.completelyFinishedIndex + props.currentTextIndex)}</span>
+      </div>)
+}
 
 class TypingText extends Component {
   curText = "";
-  curWord = "";
   completedWordsCount = 0;
   words = [];
-  curWordIndex = 0;
 
   state = {
     passedText: "",
+    curWord: "",
+    curWordIndex: 0,
     currWordPassedText: "",
     failedText: "",
     remainingText: "",
+    currentlyValidIndex: 0,
     currText: "",
+    completelyFinishedIndex: 0,
     remainingTime: 0,
     wordSpeed: 0
   };
@@ -25,8 +38,6 @@ class TypingText extends Component {
   }
 
   initGame() {
-    var gameLength = 180;
-
     console.log("init game");
     this.setState(
       {
@@ -35,11 +46,9 @@ class TypingText extends Component {
       () => {
         var textWithoutNewlines = this.props.text.replace(/(\r\n|\n|\r)/gm, "");
         this.words = textWithoutNewlines.split(" ");
-        this.curWord = this.getNextWord();
+        this.state.curWord = this.getNextWord();
       }
     );
-
-    
   }
 
   updateWpm() {}
@@ -57,132 +66,93 @@ class TypingText extends Component {
   }
 
   getNextWord() {
-    // let nextSpaceIndex = Math.min(this.state.remainingText.indexOf(" "), this.state.remainingText.indexOf('\n'));
-    // if (nextSpaceIndex !== -1) {
-    //   return this.state.remainingText.substr(0, nextSpaceIndex);
-    // }
-    // if (this.state.remainingText) {
-    //   return this.state.remainingText;
-    // }
-    // return null;
-    return this.words[this.curWordIndex++]
+    var wordToReturn = this.words[this.state.curWordIndex]
+    this.setState({
+      curWordIndex: this.state.curWordIndex + 1,
+      curWord: wordToReturn})
   }
 
   componentDidMount() {
     this.initGame();
   }
 
-  
-  handleType(event) {
-    let newText = event.target.value;
-    
-    if (
-      event.target.value[event.target.value.length - 1] === " "  &&
-      this.curWord === newText.slice(0, -1)
-    ) {
-      // Handle completing a word
-      this.completedWordsCount++;
-      this.setState(
-        {
-          remainingText: this.props.text.slice(this.state.passedText.length + this.curWord.length + 1),
-          passedText: this.state.passedText + this.curWord + " ",
-          currWordPassedText: ""
-        },
-        () => {
-          this.setState({
-            currText: ""
-          })
-          this.curWord = this.getNextWord();
-          if (!this.curWord) {
-            console.log("finished");
-          }
-        }
-      );
-      } else {
-        var validIndex = 0
-        while(validIndex < this.curWord.length &&
-              newText[validIndex] == this.curWord[validIndex]) {
-                validIndex++
-              }
+  handleCompletedWord(word) {
+    this.completedWordsCount++;
+    this.setState(
+      {
+        completelyFinishedIndex: this.state.completelyFinishedIndex + word.length + 1,
+        currentlyValidIndex: 0,
+        remainingText: this.props.text.slice(this.state.passedText.length + this.state.curWord.length + 1),
+        passedText: this.state.passedText + this.state.curWord + " ",
+        currWordPassedText: ""
+      },
+      () => {
         this.setState({
-          currText: newText,
-          currWordPassedText: this.curWord.slice(0,validIndex),
-          failedText: this.props.text.slice(this.state.passedText.length + validIndex,this.state.passedText.length + newText.length),
-          remainingText: this.props.text.slice(newText.length/*this.state.currWordPassedText.length + this.state.failedText.length*/ + this.state.passedText.length)
+          currText: ""
         })
-        
+          // this.setState({curWord: this.getNextWord()})
+        this.getNextWord()
+        if (!this.state.curWord) {
+          console.log("finished");
+        }
       }
-    // // Handle backspace
-    // if (newText.length < this.curText.length) {
-    //   var remainingText = this.state.remainingText
-    //   var failedText = this.state.failedText
-    //   var passedText = this.state.passedText
-
-    //   if (this.state.failedText !== "") {
-    //     remainingText = this.state.failedText[this.state.failedText.length - 1] + this.state.remainingText
-    //     failedText = this.state.failedText.slice(0, -1)
-    //   } else {
-    //     remainingText = this.state.passedText[this.state.passedText.length - 1] + this.state.remainingText
-    //     passedText = this.state.passedText.slice(0, -1)
-    //   }
-
-    //   this.setState({
-    //     remainingText: remainingText,
-    //     failedText: failedText,
-    //     passedText: passedText
-    //   })
-    //   this.curText = newText;
-    //   return;
-    // }
-
-    // this.curText = newText;
-
-    // // The text currently matches the word
-    // if (this.curWord.startsWith(this.curText)) {
-    //   this.setState({
-    //     remainingText: this.state.remainingText.substr(1),
-    //     passedText: this.state.passedText + this.state.remainingText[0]
-    //   });
-    // } else {
-    //   if (
-    //     event.target.value[event.target.value.length - 1] === " "  &&
-    //     this.curWord === this.curText.slice(0, -1)
-    //   ) {
-    //     // Handle completing a word
-    //     event.target.value = "";
-    //     this.completedWordsCount++;
-    //     this.setState(
-    //       {
-    //         remainingText: this.state.remainingText.substr(1),
-    //         passedText: this.state.passedText + this.state.remainingText[0]
-    //       },
-    //       () => {
-    //         this.curText = "";
-    //         this.curWord = this.getNextWord();
-    //         if (!this.curWord) {
-    //           console.log("finished");
-    //         }
-    //       }
-    //     );
-    //   } else {
-    //     // Handle marking the text as invalid
-    //     this.setState({
-    //       remainingText: this.state.remainingText.substr(1),
-    //       failedText: this.state.failedText + this.state.remainingText[0]
-    //     });
-    //   }
-    // }
+    );
+  }
+  
+  handleRegularType(newText) {
+    var validIndex = 0
+    while(validIndex < this.state.curWord.length &&
+          newText[validIndex] == this.state.curWord[validIndex]) {
+            validIndex++
+          }
+    this.setState({
+      currText: newText,
+      currWordPassedText: this.state.curWord.slice(0,validIndex),
+      failedText: this.props.text.slice(this.state.passedText.length + validIndex,this.state.passedText.length + newText.length),
+      remainingText: this.props.text.slice(newText.length/*this.state.currWordPassedText.length + this.state.failedText.length*/ + this.state.passedText.length)
+    })
   }
 
+  getCurrentPassedLength(newText) {
+    var validIndex = 0
+    while(validIndex < this.state.curWord.length &&
+          newText[validIndex] == this.state.curWord[validIndex]) {
+            validIndex++
+          }
+    return validIndex
+  }
+
+  handleType(event) {
+    let newText = event.target.value;
+    this.setState({
+      currentlyValidIndex: this.getCurrentPassedLength(newText)
+    })
+    if (
+      this.state.curWord + " " === newText 
+    ) {
+      // Handle completing a word
+        this.handleCompletedWord(this.state.curWord);
+      } else {
+        this.handleRegularType(newText);
+      }
+  }
+
+  
   render() {
     return (
       <div>
-        <div>
+        <Timer></Timer>
+        {/* <div>
           <span className="passedText">{this.state.passedText}</span>
           <span className="passedText">{this.state.currWordPassedText}</span>
           <span className="failedText">{this.state.failedText}</span>
           <span className="remainingText">{this.state.remainingText}</span>
-        </div>
+        </div> */}
+        <TextViewComponent text={this.props.text} 
+                           currentTextIndex={this.state.currText.length} 
+                           completelyFinishedIndex={this.state.completelyFinishedIndex} 
+                           currentlyValidIndex={this.state.currentlyValidIndex}>
+        </TextViewComponent>
         <input type="text" value={this.state.currText} onChange={this.handleType} />
         <h3> {"Wpm : " + this.state.wordSpeed}</h3>
         <div />
