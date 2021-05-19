@@ -18,40 +18,32 @@ class TypingText extends Component {
   words = [];
 
   state = {
-    passedText: "",
     curWord: "",
     curWordIndex: 0,
     currWordPassedText: "",
-    failedText: "",
-    remainingText: "",
     currentlyValidIndex: 0,
     currText: "",
     completelyFinishedIndex: 0,
     remainingTime: 0,
-    wordSpeed: 0
+    isGameOngoing: false
   };
 
   constructor(props) {
-    super(props);
-
+    super(props)
     this.handleType = this.handleType.bind(this);
   }
 
-  initGame() {
-    console.log("init game");
-    this.setState(
-      {
-        remainingText: this.props.text
-      },
-      () => {
-        var textWithoutNewlines = this.props.text.replace(/(\r\n|\n|\r)/gm, "");
-        this.words = textWithoutNewlines.split(" ");
-        this.state.curWord = this.getNextWord();
-      }
-    );
+  initWords() {
+    var textWithoutNewlines = this.props.text.replaceAll(/(\r\n|\n|\r)/g, " ");
+    this.words = textWithoutNewlines.split(" ");
+    this.getNextWord();
   }
 
-  updateWpm() {}
+  initGame() {
+    console.log("init game");  
+    this.initWords()
+    this.setState({isGameOngoing: true})
+  }
 
   /**
    * Returns the current speed of the game
@@ -72,28 +64,21 @@ class TypingText extends Component {
       curWord: wordToReturn})
   }
 
-  componentDidMount() {
-    this.initGame();
-  }
-
   handleCompletedWord(word) {
     this.completedWordsCount++;
     this.setState(
       {
         completelyFinishedIndex: this.state.completelyFinishedIndex + word.length + 1,
         currentlyValidIndex: 0,
-        remainingText: this.props.text.slice(this.state.passedText.length + this.state.curWord.length + 1),
-        passedText: this.state.passedText + this.state.curWord + " ",
         currWordPassedText: ""
       },
       () => {
         this.setState({
           currText: ""
         })
-          // this.setState({curWord: this.getNextWord()})
         this.getNextWord()
-        if (!this.state.curWord) {
-          console.log("finished");
+        if (this.state.curWord === null) {
+          this.setState({isGameOngoing: false})
         }
       }
     );
@@ -107,9 +92,7 @@ class TypingText extends Component {
           }
     this.setState({
       currText: newText,
-      currWordPassedText: this.state.curWord.slice(0,validIndex),
-      failedText: this.props.text.slice(this.state.passedText.length + validIndex,this.state.passedText.length + newText.length),
-      remainingText: this.props.text.slice(newText.length/*this.state.currWordPassedText.length + this.state.failedText.length*/ + this.state.passedText.length)
+      currWordPassedText: this.state.curWord.slice(0,validIndex),  
     })
   }
 
@@ -141,13 +124,9 @@ class TypingText extends Component {
   render() {
     return (
       <div>
+        {this.state.isGameOngoing ?
+          <div>
         <Timer></Timer>
-        {/* <div>
-          <span className="passedText">{this.state.passedText}</span>
-          <span className="passedText">{this.state.currWordPassedText}</span>
-          <span className="failedText">{this.state.failedText}</span>
-          <span className="remainingText">{this.state.remainingText}</span>
-        </div> */}
         <TextViewComponent text={this.props.text} 
                            currentTextIndex={this.state.currText.length} 
                            completelyFinishedIndex={this.state.completelyFinishedIndex} 
@@ -155,6 +134,10 @@ class TypingText extends Component {
         </TextViewComponent>
         <input type="text" value={this.state.currText} onChange={this.handleType} />
         <h3> {"Wpm : " + this.state.wordSpeed}</h3>
+        </div>
+        : 
+          <button onClick={() => this.initGame()}>Start Game!!</button>
+        }
         <div />
       </div>
     );
